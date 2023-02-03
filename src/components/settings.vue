@@ -7,15 +7,16 @@
             </div>
         </header>
         <div class="cities-list d-flex flex-column">
-            <div v-for="city in cities" :key="city" class="city-item d-flex justify-content-between mb-2">
+            <div v-for="city in cities" :key="city" @click="$emit('setChosenCity', city)" role="button"
+                class="city-item d-flex justify-content-between mb-2">
                 {{ city }}
-                <div class="remove-btn" role="button">
+                <div class="remove-btn" role="button" @click="$emit('deleteCity', city)">
                     <Icon icon="ph:trash" />
                 </div>
             </div>
         </div>
         <div class="add-city d-flex flex-row align-items-center">
-            <input v-model.trim="cityName" placeholder="Enter city"/>
+            <input v-model.trim="cityName" placeholder="Enter city" />
             <button @click="$emit('addCity', cityName)">add city</button>
         </div>
     </div>
@@ -23,8 +24,9 @@
 
 <script>
 import { Icon } from '@iconify/vue';
+
 export default {
-    emits: ["setSettings", "addCity"],
+    emits: ["setSettings", "addCity", "setChosenCity", "deleteCity"],
     data() {
         return {
             cityName: "",
