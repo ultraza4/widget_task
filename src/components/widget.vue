@@ -43,9 +43,8 @@
 import { Icon } from '@iconify/vue';
 import Settings from './settings.vue';
 import "bootstrap/dist/css/bootstrap.min.css";
-import axios from 'axios';
 import { defineComponent } from 'vue';
-import { getCoordinates, getWeatherInfo } from "../services/weatherAPI"
+import { getCoordinates, getWeatherInfo, isCityExist } from "../services/weatherAPI"
 import { Weather, WeatherInfoType } from '../types/weatherInfoTypes'
 
 export default defineComponent({
@@ -64,16 +63,17 @@ export default defineComponent({
       Settings
    },
    methods: {
-      async fetchWeatherData() {
+      async fetchWeatherData(): Promise<void> {
          const ChosenCityCoordination = await getCoordinates(this.chosenCity)
          this.weatherInfo = await getWeatherInfo(ChosenCityCoordination)
          this.weatherMainInfo = this.weatherInfo.weather[0]
          this.componentLoaded = true
       },
-      async setCurrentCityInfo() {
+      async setCurrentCityInfo(): Promise<void> {
          const success = async (position): Promise<void> => {
             const latitude = position.coords?.latitude;
             const longitude = position.coords?.longitude;
+
             this.weatherInfo = await getWeatherInfo({ lat: latitude, lon: longitude })
             this.weatherMainInfo = this.weatherInfo.weather[0]
 
@@ -81,10 +81,10 @@ export default defineComponent({
             if (!this.cities.includes(this.weatherInfo.name)) {
                this.cities.push(this.weatherInfo.name.toLowerCase())
             }
+
             localStorage.setItem('cities', JSON.stringify(this.cities))
             localStorage.setItem('chosenCity', JSON.stringify(this.weatherInfo.name.toLowerCase()))
          };
-
          const error = (err) => {
             console.log(err)
             throw (error)
@@ -103,18 +103,16 @@ export default defineComponent({
          localStorage.setItem('chosenCity', JSON.stringify(this.chosenCity))
          this.fetchWeatherData()
       },
-      addCity(cityName: string): void {
-         axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=5&appid=10ecbab3e9aca4de70736689048eeee4`)
-            .then(res => {
-               if (!this.cities.includes(cityName.toLowerCase()) && res.data[0]) {
-                  this.cities.push(cityName.toLowerCase())
-                  localStorage.setItem('cities', JSON.stringify(this.cities))
-               } else if (this.cities.includes(cityName.toLowerCase())) {
-                  alert("This city is already in the list.")
-               } else {
-                  alert("There is no such city in the World. Sorry.")
-               }
-            })
+      async addCity(cityName: string): Promise<void> {
+         const isExist = await isCityExist(cityName);
+         if (!this.cities.includes(cityName.toLowerCase()) && isExist) {
+            this.cities.push(cityName.toLowerCase())
+            localStorage.setItem('cities', JSON.stringify(this.cities))
+         } else if (this.cities.includes(cityName.toLowerCase())) {
+            alert("This city is already in the list.")
+         } else {
+            alert("There is no such city in the World. Sorry.")
+         }
       },
       deleteCity(cityName: string): void {
          this.cities = this.cities.filter((city: string): boolean => city !== cityName)
@@ -137,7 +135,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="css">
+<style scoped>
 .widget-wrapper {
    width: 240px;
    height: 100%;
