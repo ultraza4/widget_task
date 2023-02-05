@@ -1,5 +1,5 @@
 <template>
-    <div class="settings-wrapper d-flex flex-column h-100">
+    <div class="settings-wrapper d-flex flex-column">
         <header class="d-flex flex-row justify-content-between align-items-center mb-3">
             <span>Settings</span>
             <div class="settings-close" @click="$emit('setSettings')">
@@ -8,7 +8,7 @@
         </header>
         <DragAndDropList @deleteCity="deleteCity" @setChosenCity="setChosenCity" :cities="cities"
             :chosenCity="chosenCity" />
-        <div class="add-city d-flex flex-row align-items-center">
+        <div class="add-city d-flex flex-row align-items-center mt-auto">
             <input v-model.trim="cityName" placeholder="Enter city" class="input" />
             <button class="btn btn-sm btn-warning m-1" @click="addCity">Add</button>
         </div>
@@ -55,12 +55,13 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.settings-close {
-    cursor: pointer;
+.settings-wrapper {
+    min-height: 300px;
+    height: 100%;
 }
 
-.add-city {
-    margin-top: auto;
+.settings-close {
+    cursor: pointer;
 }
 
 .input {
