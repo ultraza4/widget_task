@@ -74,7 +74,7 @@ export default {
             const longitude = position.coords?.longitude;
             this.weatherInfo = await getWeatherInfo({ lat: latitude, lon: longitude })
             this.weatherMainInfo = await this.weatherInfo.weather[0]
-
+            this.chosenCity = this.weatherInfo.name.toLowerCase()
             if (!this.cities.includes(this.weatherInfo.name)) {
                this.cities.push(this.weatherInfo.name.toLowerCase())
             }
@@ -120,7 +120,7 @@ export default {
    mounted() {
       this.chosenCity = localStorage.getItem('chosenCity') ? JSON.parse(localStorage.getItem("chosenCity"))
          : this.setCurrentCityInfo()
-      if (this.componentLoaded) {
+      if (!this.componentLoaded) {
          this.fetchWeatherData()
          this.setCities()
       }
