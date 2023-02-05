@@ -127,9 +127,7 @@ export default {
    },
    computed: {
       getUrl() {
-         if (this.componentLoaded) {
-            return `http://openweathermap.org/img/wn/${this.weatherMainInfo.icon}@2x.png`
-         }
+         return `http://openweathermap.org/img/wn/${this.weatherMainInfo.icon}@2x.png`
       },
    }
 }
