@@ -33,7 +33,7 @@
             </div>
          </div>
       </div>
-      <Settings v-if="settings" @setSettings="setSettings" :cities="cities" @addCity="addCity"
+      <Settings v-if="settings" @setSettings="setSettings" :cities="cities" :chosenCity="chosenCity" @addCity="addCity"
          @setChosenCity="setChosenCity" @deleteCity="deleteCity" />
    </div>
 </template>
@@ -51,7 +51,7 @@ export default {
          weatherMainInfo: {},
          chosenCity: '',
          settings: false,
-         cities: []
+         cities: [],
       }
    },
    components: {
@@ -67,7 +67,6 @@ export default {
             const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${ChosenCityCoordination.lat}&lon=${ChosenCityCoordination.lon}&appid=10ecbab3e9aca4de70736689048eeee4&units=metric`)
             this.weatherInfo = response.data
             this.weatherMainInfo = response.data.weather[0]
-            console.log(this.weatherInfo)
          } catch (error) {
             console.log(error)
          }
@@ -82,10 +81,10 @@ export default {
             this.weatherMainInfo = response.data.weather[0]
 
             if (!this.cities.includes(response.data.name)) {
-               this.cities.push(response.data.name)
+               this.cities.push(response.data.name.toLowerCase())
             }
             localStorage.setItem('cities', JSON.stringify(this.cities))
-            localStorage.setItem('chosenCity', JSON.stringify(response.data.name))
+            localStorage.setItem('chosenCity', JSON.stringify(response.data.name.toLowerCase()))
          };
 
          const error = (err) => {
@@ -100,13 +99,22 @@ export default {
          this.cities = localStorage.getItem('cities') ? JSON.parse(localStorage.getItem("cities")) : []
       },
       setChosenCity(city) {
-         this.chosenCity = city
+         this.chosenCity = city.toLowerCase()
          localStorage.setItem('chosenCity', JSON.stringify(this.chosenCity))
          this.fetchWeatherData()
       },
       addCity(cityName) {
-         this.cities.push(cityName)
-         localStorage.setItem('cities', JSON.stringify(this.cities))
+         axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=5&appid=10ecbab3e9aca4de70736689048eeee4`)
+            .then(res => {
+               if (!this.cities.includes(cityName.toLowerCase()) && res.data[0]) {
+                  this.cities.push(cityName.toLowerCase())
+                  localStorage.setItem('cities', JSON.stringify(this.cities))
+               } else if (this.cities.includes(cityName.toLowerCase())) {
+                  alert("This city is already in the list.")
+               } else {
+                  alert("There is no such city in the World. Sorry.")
+               }
+            })
       },
       deleteCity(cityName) {
          this.cities = this.cities.filter(city => city !== cityName)
@@ -129,8 +137,9 @@ export default {
 
 <style lang="css">
 .widget-wrapper {
-   width: 230px;
+   width: 240px;
    height: 100%;
+   min-height: 300px;
    margin: 10px;
    padding: 5px;
    border: 1px solid black;

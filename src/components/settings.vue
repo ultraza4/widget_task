@@ -1,29 +1,23 @@
 <template>
-    <div class="settings-wrapper">
+    <div class="settings-wrapper d-flex flex-column h-100">
         <header class="d-flex flex-row justify-content-between align-items-center mb-3">
             <span>Settings</span>
             <div class="settings-close" @click="$emit('setSettings')">
                 <Icon icon="material-symbols:close" />
             </div>
         </header>
-        <div class="cities-list d-flex flex-column">
-            <div v-for="city in cities" :key="city" @click="$emit('setChosenCity', city)" role="button"
-                class="city-item d-flex justify-content-between mb-2">
-                {{ city }}
-                <div class="remove-btn" role="button" @click="$emit('deleteCity', city)">
-                    <Icon icon="ph:trash" />
-                </div>
-            </div>
-        </div>
+        <DragAndDropList :cities="cities" @deleteCity="deleteCity" @setChosenCity="setChosenCity"
+            :chosenCity="chosenCity" />
         <div class="add-city d-flex flex-row align-items-center">
-            <input v-model.trim="cityName" placeholder="Enter city" />
-            <button @click="$emit('addCity', cityName)">add city</button>
+            <input v-model.trim="cityName" placeholder="Enter city" class="input" />
+            <button class="btn btn-sm btn-warning m-1" @click="addCity">Add</button>
         </div>
     </div>
 </template>
 
 <script>
 import { Icon } from '@iconify/vue';
+import DragAndDropList from './dragAndDropList.vue';
 
 export default {
     emits: ["setSettings", "addCity", "setChosenCity", "deleteCity"],
@@ -33,12 +27,24 @@ export default {
         }
     },
     components: {
-        Icon
+        Icon,
+        DragAndDropList
     },
     props: {
         cities: Array,
+        chosenCity: String
     },
     methods: {
+        deleteCity(city) {
+            this.$emit('deleteCity', city)
+        },
+        addCity() {
+            this.$emit('addCity', this.cityName)
+            this.cityName = ""
+        },
+        setChosenCity(city) {
+            this.$emit('setChosenCity', city)
+        }
     }
 }
 </script>
@@ -46,5 +52,20 @@ export default {
 <style scoped>
 .settings-close {
     cursor: pointer;
+}
+
+.add-city {
+    margin-top: auto;
+}
+
+.input {
+    width: 80%;
+    margin: 0px 5px;
+}
+
+.btn {
+    background-color: cornflowerblue;
+    border-color: cornflowerblue;
+    color: white;
 }
 </style>
