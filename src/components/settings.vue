@@ -6,7 +6,7 @@
                 <Icon icon="material-symbols:close" />
             </div>
         </header>
-        <DragAndDropList :cities="cities" @deleteCity="deleteCity" @setChosenCity="setChosenCity"
+        <DragAndDropList @deleteCity="deleteCity" @setChosenCity="setChosenCity" :cities="cities"
             :chosenCity="chosenCity" />
         <div class="add-city d-flex flex-row align-items-center">
             <input v-model.trim="cityName" placeholder="Enter city" class="input" />
@@ -15,11 +15,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { Icon } from '@iconify/vue';
 import DragAndDropList from './dragAndDropList.vue';
+import { defineComponent, PropType } from 'vue';
 
-export default {
+export default defineComponent({
     emits: ["setSettings", "addCity", "setChosenCity", "deleteCity"],
     data() {
         return {
@@ -31,22 +32,26 @@ export default {
         DragAndDropList
     },
     props: {
-        cities: Array,
-        chosenCity: String
+        chosenCity: String,
+        cities: {
+            type: Array as PropType<Array<string>>,
+            required: true,
+            default: []
+        }
     },
     methods: {
-        deleteCity(city) {
+        deleteCity(city: string): void {
             this.$emit('deleteCity', city)
         },
-        addCity() {
+        addCity(): void {
             this.$emit('addCity', this.cityName)
             this.cityName = ""
         },
-        setChosenCity(city) {
+        setChosenCity(city: string): void {
             this.$emit('setChosenCity', city)
         }
     }
-}
+})
 </script>
 
 <style scoped>

@@ -33,28 +33,30 @@
             </div>
          </div>
       </div>
-      <Settings v-if="settings" @setSettings="setSettings" :cities="cities" :chosenCity="chosenCity" @addCity="addCity"
+      <Settings v-if="settings" :cities="cities" @setSettings="setSettings" :chosenCity="chosenCity" @addCity="addCity"
          @setChosenCity="setChosenCity" @deleteCity="deleteCity" />
       <Icon v-if="!componentLoaded" icon="eva:loader-outline" width="60" />
    </div>
 </template>
 
-<script>
+<script lang="ts">
 import { Icon } from '@iconify/vue';
 import Settings from './settings.vue';
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from 'axios';
+import { defineComponent } from 'vue';
 import { getCoordinates, getWeatherInfo } from "../services/weatherAPI"
+import { Weather, WeatherInfoType } from '../types/weatherInfoTypes'
 
-export default {
+export default defineComponent({
    data() {
       return {
-         weatherInfo: {},
-         weatherMainInfo: {},
-         chosenCity: '',
-         settings: false,
-         cities: [],
-         componentLoaded: false
+         weatherInfo: {} as WeatherInfoType,
+         weatherMainInfo: {} as Weather,
+         chosenCity: "" as string,
+         settings: false as boolean,
+         cities: [] as Array<string>,
+         componentLoaded: false as boolean
       }
    },
    components: {
@@ -65,15 +67,16 @@ export default {
       async fetchWeatherData() {
          const ChosenCityCoordination = await getCoordinates(this.chosenCity)
          this.weatherInfo = await getWeatherInfo(ChosenCityCoordination)
-         this.weatherMainInfo = await this.weatherInfo.weather[0]
+         this.weatherMainInfo = this.weatherInfo.weather[0]
          this.componentLoaded = true
       },
       async setCurrentCityInfo() {
-         const success = async (position) => {
+         const success = async (position): Promise<void> => {
             const latitude = position.coords?.latitude;
             const longitude = position.coords?.longitude;
             this.weatherInfo = await getWeatherInfo({ lat: latitude, lon: longitude })
-            this.weatherMainInfo = await this.weatherInfo.weather[0]
+            this.weatherMainInfo = this.weatherInfo.weather[0]
+
             this.chosenCity = this.weatherInfo.name.toLowerCase()
             if (!this.cities.includes(this.weatherInfo.name)) {
                this.cities.push(this.weatherInfo.name.toLowerCase())
@@ -84,22 +87,23 @@ export default {
 
          const error = (err) => {
             console.log(err)
+            throw (error)
          };
          navigator.geolocation.getCurrentPosition(success, error);
          this.componentLoaded = true
       },
-      setSettings() {
+      setSettings(): void {
          this.settings = this.settings ? false : true
       },
-      setCities() {
-         this.cities = localStorage.getItem('cities') ? JSON.parse(localStorage.getItem("cities")) : []
+      setCities(): void {
+         this.cities = localStorage.getItem('cities') ? JSON.parse(localStorage.getItem("cities") || '') : [] as Array<string>
       },
-      setChosenCity(city) {
+      setChosenCity(city: string): void {
          this.chosenCity = city.toLowerCase()
          localStorage.setItem('chosenCity', JSON.stringify(this.chosenCity))
          this.fetchWeatherData()
       },
-      addCity(cityName) {
+      addCity(cityName: string): void {
          axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=5&appid=10ecbab3e9aca4de70736689048eeee4`)
             .then(res => {
                if (!this.cities.includes(cityName.toLowerCase()) && res.data[0]) {
@@ -112,13 +116,13 @@ export default {
                }
             })
       },
-      deleteCity(cityName) {
-         this.cities = this.cities.filter(city => city !== cityName)
+      deleteCity(cityName: string): void {
+         this.cities = this.cities.filter((city: string): boolean => city !== cityName)
          localStorage.setItem('cities', JSON.stringify(this.cities))
       },
    },
    mounted() {
-      this.chosenCity = localStorage.getItem('chosenCity') ? JSON.parse(localStorage.getItem("chosenCity"))
+      this.chosenCity = localStorage.getItem('chosenCity') ? JSON.parse(localStorage.getItem("chosenCity") || "")
          : this.setCurrentCityInfo()
       if (!this.componentLoaded) {
          this.fetchWeatherData()
@@ -126,11 +130,11 @@ export default {
       }
    },
    computed: {
-      getUrl() {
+      getUrl(): string {
          return `http://openweathermap.org/img/wn/${this.weatherMainInfo.icon}@2x.png`
       },
    }
-}
+})
 </script>
 
 <style lang="css">

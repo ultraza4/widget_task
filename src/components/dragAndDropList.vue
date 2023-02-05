@@ -1,7 +1,6 @@
 <template>
    <div class="flex m-10">
-      <draggable class="list-group" :list="cities" handle=".area" @start="drag = true" @end="drag = false"
-         @change="setChangedCities">
+      <draggable class="list-group" :list="cities" handle=".area" @change="setChangedCities">
          <transition-group name="flip-transition">
             <div class="list-group-item bg-gray-300 m-1 p-1 rounded-md d-flex flex-row"
                :class="{ active: city === chosenCity }" v-for="city in cities" :key="city">
@@ -9,7 +8,7 @@
                   <Icon icon="circum:menu-burger" />
                </span>
                <span class="me-auto" role="button" @click="$emit('setChosenCity', city)">
-                  {{ city }}
+                  {{ city.charAt(0).toUpperCase() + city.slice(1) }}
                </span>
                <div class="remove-btn" role="button" @click="$emit('deleteCity', city)">
                   <Icon icon="ph:trash" />
@@ -21,32 +20,39 @@
    </div>
 </template>
 
-<script>
+<script lang="ts">
+
 import { VueDraggableNext } from 'vue-draggable-next';
 import { Icon } from '@iconify/vue';
+import { defineComponent, PropType } from 'vue';
 
-export default {
+export default defineComponent({
    emits: ["setChosenCity", "deleteCity"],
    data() {
       return {
          enabled: true,
-         dragging: false
+         dragging: false,
       }
    },
    props: {
-      cities: Array,
-      chosenCity: String
+      chosenCity: String,
+      cities: {
+         type: Array as PropType<Array<string>>,
+         required: true,
+         default: []
+      }
    },
    components: {
       draggable: VueDraggableNext,
       Icon,
    },
    methods: {
-      setChangedCities() {
+      setChangedCities(): void {
          localStorage.setItem('cities', JSON.stringify(this.cities))
       }
    },
-}
+
+})
 </script>
 
 <style scoped>

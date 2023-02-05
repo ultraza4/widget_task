@@ -3,7 +3,7 @@ const webpack = require('webpack')
 const { VueLoaderPlugin } = require("vue-loader");
 
 module.exports = {
-  entry: './src/main.js',
+  entry: './src/main.ts',
   mode: 'development',
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -31,7 +31,14 @@ module.exports = {
           'vue-style-loader',
           'css-loader',
         ]
-      }
+      },
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+        }
+    }
     ]
   },
   plugins: [new VueLoaderPlugin()]
