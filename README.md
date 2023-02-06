@@ -12,3 +12,4 @@ For example:
 </body>
 ```
 JS file is in the dist folder
+In demo folder you can open an index.html file with weather-widget in it.
