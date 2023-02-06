@@ -143,10 +143,11 @@ export default defineComponent({
    margin: 10px;
    padding: 5px;
    border: 1px solid black;
-   background-color: cornsilk;
+   background-color: #1494fc;
    border-radius: 15px;
    display: flex;
    justify-content: center;
+   color: white;
 }
 
 .header-settings {
@@ -164,7 +165,7 @@ export default defineComponent({
    border: 1px solid black;
    border-radius: 10px;
    padding: 5px;
-   background-color: white;
+   background-color: #015497;
 }
 
 .additional-info {

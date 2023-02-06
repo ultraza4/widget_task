@@ -9,7 +9,7 @@
         <DragAndDropList @deleteCity="deleteCity" @setChosenCity="setChosenCity" :cities="cities"
             :chosenCity="chosenCity" />
         <div class="add-city d-flex flex-row align-items-center mt-auto">
-            <input v-model.trim="cityName" placeholder="Enter city" class="input" />
+            <input v-model.trim="cityName" @keyup.enter="addCity" placeholder="Enter city" class="input" />
             <button class="btn btn-sm btn-warning m-1" @click="addCity">Add</button>
         </div>
     </div>
