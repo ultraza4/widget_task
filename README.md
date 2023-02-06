@@ -11,5 +11,5 @@ For example:
   <script src="../dist/weather-widget.js"></script>
 </body>
 ```
-JS file is in the dist folder
+JS file is in the dist folder.
 In demo folder you can open an index.html file with weather-widget in it.
