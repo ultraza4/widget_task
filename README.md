@@ -5,7 +5,10 @@
 4) Add this widget to a websites as simple as inserting the snippet into an HTML-page.
 
 For example:
-"<weather-widget/>"
-"<script src="../dist/weather-widget.js"></script>"
-
+```
+<body>
+  <weather-widget/>
+  <script src="../dist/weather-widget.js"></script>
+</body>
+```
 JS file is in the dist folder
